@@ -15,9 +15,9 @@ The image uses:
 
 The .env file shold have your GitHub credentials, i.e. username, email, token, such as follows:
 
-    `GITHUB_TOKEN=your-token-here`
-    `GITHUB_NAME=username`
-    `GITHUB_EMAIL=first.lastname@email.com`
+    GITHUB_TOKEN=your-token-here
+    GITHUB_NAME=username
+    GITHUB_EMAIL=first.lastname@email.com
 
 To create an image:
 
