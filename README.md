@@ -29,10 +29,16 @@ Run container based on created image:
 
     OR use following, if .env file is in the same dir:
 
-    - docker run -p 8800:8888 -v ~/projects/jupy:/data --env-file .env IMAGENAME
+    - docker run -p 8800:8888 -v /path-to-your-folder:/app --env-file .env IMAGENAME
 
 
-The jupyterlab notebook can now be accessed at: http://127.0.0.1:8800/lab
+The container uses /app folder inside the container for storing code/data. You can map a local folder to this app folder in order to persist any code/data generated. 
+
+Similarly, the local port 8800 is mapped to the conatiner port 8888 which is used to listen to any incoming traffic by the container. If the port 8800 is busy on your local machine, try a different port for mapping to 8888.
+
+
+Jupyterlab notebook can now be accessed at: http://127.0.0.1:8800/lab
+
 
 In the notebook, you can access bash console login into your GitHub as follows:
 
