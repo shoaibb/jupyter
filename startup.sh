@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Create JupyterLab configuration with GitHub extension
+mkdir -p /root/.jupyter
+
+# Create main JupyterLab configuration
+cat > /root/.jupyter/jupyter_lab_config.py << EOF
+# JupyterLab Configuration
+c.ServerApp.terminado_settings = {'shell_command': ['/bin/bash']}
+
+# GitHub Extension Configuration
+if hasattr(c, 'GitHubConfig'):
+    c.GitHubConfig.access_token = '${GITHUB_TOKEN}'
+EOF
+
 # Configure Git if environment variables are set
 if [ ! -z "$GITHUB_NAME" ]; then
     git config --global user.name "$GITHUB_NAME"
