@@ -1,0 +1,9 @@
+jupyterlab
+jupyterlab-git
+jupyterlab-github
+jupyterlab-system-monitor
+jupyterlab-night
+jupyterlab-logout
+pandas
+numpy
+selenium
