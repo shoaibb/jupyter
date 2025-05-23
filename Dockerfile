@@ -1,62 +1,53 @@
+# Use appropriate base image
+#FROM jupyter/base-notebook:latest
 FROM python:3.11
 
+# Switch to root user for installation
+USER root
+
+# Update pip
 RUN python -m pip install --upgrade pip
 
-# Set the working directory to /data
+# Set the working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /data
-COPY . /app
-
-# Install Node.js (required for JupyterLab extensions)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs git vim
-
-
-RUN pip install bash_kernel
-
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Install additional extensions via jupyter labextension (if needed)
-# Note: Most extensions are now distributed as pip packages, but some still require labextension install
-RUN jupyter labextension install --no-build \
-    @jupyter-widgets/jupyterlab-manager && \
-    jupyter lab build --minimize=False
-
-
-# Clean up to reduce image size
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    npm cache clean --force && \
-    jupyter lab clean
-
-
-# Create SSH directory
-RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
-
-# Create startup script
+# Copy requirements and startup script only (not .env file)
+COPY requirements.txt /app/
 COPY startup.sh /usr/local/bin/startup.sh
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y curl git vim software-properties-common && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0 && \
+    apt-get update && \
+    apt-get install -y gh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install Python packages
+RUN pip install bash_kernel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install JupyterLab extensions
+RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager && \
+    jupyter lab build --minimize=False && \
+    jupyter lab clean && \
+    npm cache clean --force
+
+# Create necessary directories and set permissions
+RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh && \
+    mkdir -p /root/.jupyter
+
+# Make startup script executable
 RUN chmod +x /usr/local/bin/startup.sh
 
+# Set environment variables
 ENV SHELL=/bin/bash
 
-# Create JupyterLab configuration directory and set terminal shell
-RUN mkdir -p /root/.jupyter && \
-    echo "c.ServerApp.terminado_settings = {'shell_command': ['/bin/bash']}" > /root/.jupyter/jupyter_lab_config.py
-
-RUN apt update && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0 && \
-    apt-get install -y software-properties-common && \
-    apt update && \
-    apt install gh && \
-    apt-get clean
-
-# Create startup script for Git configuration
-COPY startup.sh /usr/local/bin/startup.sh
-RUN chmod +x /usr/local/bin/startup.sh
-
-# Make port 8888 available
+# Expose port
 EXPOSE 8888
 
+# Set the startup command
 CMD ["/usr/local/bin/startup.sh"]

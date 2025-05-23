@@ -1,53 +1,147 @@
-# Docker image for jupyter lab
+# JupyterLab with GitHub Integration
 
-The image uses:
+A Docker container that provides JupyterLab with GitHub integration, allowing users to authenticate with their own GitHub credentials.
 
-    - bash
-    - vim
-    - wget
-    - curl
-    - pip
-    - git and Github
-    - jupyter lab
-    - extensions & python packages in requirements.txt
-    - python version 3.11
-    - Github env variables (token, email, username) are read from a .env file
+## Quick Start
 
-The .env file shold have your GitHub credentials, i.e. username, email, token, such as follows:
+### Prerequisites
 
-    GITHUB_TOKEN=your-token-here
-    GITHUB_NAME=username
-    GITHUB_EMAIL=first.lastname@email.com
+- Docker and Docker Compose installed
+- A GitHub Personal Access Token
 
-To create an image:
+### Setup
 
-    - docker build -t IMAGENAME .
+1. **Clone this repository**
+   ```bash
+   git clone <your-repo-url>
+   cd <repo-name>
+   ```
 
-Run container based on created image:
+2. **Create your environment file**
+   ```bash
+   cp .env.template .env
+   ```
 
-    - docker run -p 8800:8888 -v /path-to/your-project-dir:/app --env-file /path-to/.env IMAGENAME
+3. **Edit the `.env` file with your GitHub credentials**
+   ```bash
+   # Required: GitHub Personal Access Token
+   GITHUB_TOKEN=ghp_your_token_here
+   
+   # Required: Your GitHub info
+   GITHUB_NAME=Your Name
+   GITHUB_EMAIL=your.email@example.com
+   
+   # Optional: GitHub username (if different from token)
+   GITHUB_USERNAME=your_username
+   ```
 
-    OR use following, if .env file is in the same dir:
+4. **Start the container**
+   ```bash
+   docker-compose up -d
+   ```
 
-    - docker run -p 8800:8888 -v /path-to-your-folder:/app --env-file .env IMAGENAME
+5. **Access JupyterLab**
+   Open http://localhost:8888 in your browser
 
+## GitHub Personal Access Token
 
-The container uses /app folder inside the container for storing code/data. You can map a local folder to this app folder in order to persist any code/data generated. 
+To create a GitHub Personal Access Token:
 
-Similarly, the local port 8800 is mapped to the conatiner port 8888 which is used to listen to any incoming traffic by the container. If the port 8800 is busy on your local machine, try a different port for mapping to 8888.
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Give it a descriptive name
+4. Select appropriate scopes:
+   - `repo` (for repository access)
+   - `workflow` (if you need to work with GitHub Actions)
+   - `user:email` (for email access)
+5. Click "Generate token"
+6. Copy the token immediately (you won't see it again)
 
+## Usage Options
 
-Jupyterlab notebook can now be accessed at: http://127.0.0.1:8800/lab
+### Option 1: Docker Compose (Recommended)
+```bash
+docker-compose up -d
+```
 
+### Option 2: Docker Run
+```bash
+docker run -d \
+  -p 8888:8888 \
+  -e GITHUB_TOKEN=your_token \
+  -e GITHUB_NAME="Your Name" \
+  -e GITHUB_EMAIL="your.email@example.com" \
+  -v $(pwd)/workspace:/app/workspace \
+  your-image-name
+```
 
-In the notebook, you can access bash console login into your GitHub as follows:
+### Option 3: With SSH Keys
+If you prefer SSH-based Git operations:
+```bash
+docker run -d \
+  -p 8888:8888 \
+  -e GITHUB_NAME="Your Name" \
+  -e GITHUB_EMAIL="your.email@example.com" \
+  -v ~/.ssh:/root/.ssh:ro \
+  -v $(pwd)/workspace:/app/workspace \
+  your-image-name
+```
 
-    - gh auth login
+## Directory Structure
 
-To get a list of your repos:
+```
+.
+├── Dockerfile
+├── docker-compose.yml
+├── startup.sh
+├── requirements.txt
+├── .env.template
+├── .env (create this from template)
+├── .gitignore
+└── workspace/ (your work directory)
+```
 
-    - gh repo list
+## Security Notes
 
+- Never commit your `.env` file to version control
+- The `.env.template` file is included as a reference
+- Your GitHub token is only used at runtime, not baked into the image
+- SSH keys are mounted read-only if you choose to use them
 
-Note: since your GitHub credentials are added as .env variables to the running container, you can use these for git related commands on your GitHub repos in bash from within your jupyterlab container.
+## Environment Variables
 
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GITHUB_TOKEN` | Yes | Your GitHub Personal Access Token |
+| `GITHUB_NAME` | Yes | Your full name for Git commits |
+| `GITHUB_EMAIL` | Yes | Your email for Git commits |
+| `GITHUB_USERNAME` | No | Your GitHub username (optional) |
+
+## Building Your Own Image
+
+If you want to build and share your own version:
+
+```bash
+# Build the image
+docker build -t your-dockerhub-username/jupyter-github:latest .
+
+# Push to Docker Hub
+docker push your-dockerhub-username/jupyter-github:latest
+```
+
+## Troubleshooting
+
+### Git Authentication Issues
+- Ensure your GitHub token has the correct permissions
+- Check that your token isn't expired
+- Verify the token is correctly set in your `.env` file
+
+### Container Won't Start
+- Check that port 8888 isn't already in use
+- Verify all required environment variables are set
+- Check Docker logs: `docker-compose logs`
+
+### SSH Key Issues
+- Ensure SSH keys are properly formatted and have correct permissions
+- Make sure the public key is added to your GitHub account
+- Verify the private key path in the volume mount

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  jupyter-lab:
+    build: .
+    ports:
+      - "8888:8888"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_NAME=${GITHUB_NAME}
+      - GITHUB_EMAIL=${GITHUB_EMAIL}
+      - GITHUB_USERNAME=${GITHUB_USERNAME}
+    volumes:
+      # Mount your project directory
+      - ./workspace:/app/workspace
+      # Optional: Mount SSH keys for SSH-based Git operations
+      - ~/.ssh:/root/.ssh:ro
+    restart: unless-stopped
