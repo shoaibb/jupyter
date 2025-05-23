@@ -59,12 +59,12 @@ To create a GitHub Personal Access Token:
 
 ## Usage Options
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Docker Compose
 ```bash
 docker-compose up -d
 ```
 
-### Option 2: Docker Run
+### Option 2: Docker Run with env variables
 ```bash
 docker run -d \
   -p 8888:8888 \
@@ -74,6 +74,24 @@ docker run -d \
   -v $(pwd)/workspace:/app/workspace \
   your-image-name
 ```
+
+### Option 2a: Docker run with env variables in a file
+```bash
+docker run -d \
+  -p 8800:8888 \
+  --env-file .env \
+  -v $(pwd)/workspace:/app \  
+  your-image-name
+```
+
+### Option 2b: Docker run without Github credentials in container
+```bash
+docker run -d \
+-p 8800:8888 \
+-v $(pwd)/workspace:/app \
+your-image-name
+```
+
 
 ### Option 3: With SSH Keys
 If you prefer SSH-based Git operations:
@@ -86,6 +104,11 @@ docker run -d \
   -v $(pwd)/workspace:/app/workspace \
   your-image-name
 ```
+
+### Option 4: ENV file
+I
+
+
 
 ## Directory Structure
 
