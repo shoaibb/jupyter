@@ -48,6 +48,7 @@ RUN chmod +x /usr/local/bin/startup.sh
 ENV SHELL=/bin/bash
 
 # git config for adding alias for add, commit, push
+# usage: git acp "message-text"
 RUN git config --global alias.acp '!f() { git add -A && git commit -m "$@" && git push; }; f'
 
 # customize terminal appearance
