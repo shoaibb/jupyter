@@ -71,7 +71,7 @@ docker run -d \
   -e GITHUB_TOKEN=your_token \
   -e GITHUB_NAME="Your Name" \
   -e GITHUB_EMAIL="your.email@example.com" \
-  -v $(pwd)/workspace:/app/workspace \
+  -v $(pwd)/workspace:/app \
   your-image-name
 ```
 
@@ -101,7 +101,7 @@ docker run -d \
   -e GITHUB_NAME="Your Name" \
   -e GITHUB_EMAIL="your.email@example.com" \
   -v ~/.ssh:/root/.ssh:ro \
-  -v $(pwd)/workspace:/app/workspace \
+  -v $(pwd)/workspace:/app \
   your-image-name
 ```
 
@@ -120,8 +120,7 @@ I
 ├── requirements.txt
 ├── .env.template
 ├── .env (create this from template)
-├── .gitignore
-└── workspace/ (your work directory)
+└── .gitignore/ 
 ```
 
 ## Security Notes
@@ -144,12 +143,19 @@ I
 
 If you want to build and share your own version:
 
+### DockerHub image
 ```bash
 # Build the image
 docker build -t your-dockerhub-username/jupyter-github:latest .
 
 # Push to Docker Hub
 docker push your-dockerhub-username/jupyter-github:latest
+```
+### Local image
+
+```bash
+# Build the image
+docker build -t jupyter-github:latest .
 ```
 
 ## Troubleshooting
