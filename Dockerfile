@@ -22,6 +22,7 @@ RUN apt-get update && \
     apt-get install -y nodejs && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0 && \
     apt-get update && \
+    apt-get install less && \
     apt-get install -y gh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -45,6 +46,20 @@ RUN chmod +x /usr/local/bin/startup.sh
 
 # Set environment variables
 ENV SHELL=/bin/bash
+
+# git config for adding alias for add, commit, push
+RUN git config --global alias.acp '!f() { git add -A && git commit -m "$@" && git push; }; f'
+
+# customize terminal appearance
+RUN echo "export TERM=xterm-256color" >> /root/.bashrc
+#RUN echo "export PS1='\[\e[32m\]shoaib\[\e[m\]->\[\e[34m\]\w\[\e[m\]:\$ '" >> /root/.bashrc
+RUN echo "export LS_OPTIONS='--color=always'" >> /root/.bashrc
+RUN echo "eval "$(dircolors)"" >> /root/.bashrc
+RUN echo "alias ls='ls $LS_OPTIONS'" >> /root/.bashrc
+RUN echo "alias ll='ls $LS_OPTIONS -l'" >> /root/.bashrc
+RUN echo "alias l='ls $LS_OPTIONS -lA'" >> /root/.bashrc
+RUN echo "alias ls='ls --color=always'" >> /root/.bashrc
+
 
 # Expose port
 EXPOSE 8888
