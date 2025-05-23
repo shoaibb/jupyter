@@ -105,11 +105,6 @@ docker run -d \
   your-image-name
 ```
 
-### Option 4: ENV file
-I
-
-
-
 ## Directory Structure
 
 ```
